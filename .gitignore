@@ -1,0 +1,7 @@
+/user-service/.env
+/user-service/node_modules
+/material-service/.env
+/material-service/node_modules
+/transaction-service/.env
+/transaction-service/node_modules
+/database-migrator/node_modules
