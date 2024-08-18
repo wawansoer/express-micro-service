@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sutisna
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: ../Dockerfile
+    container_name: user-service
+    environment:
+      SERVER_URL: http://localhost
+      SERVER_PORT: 3001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: sutisna
+      DB_USER: root
+      DB_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+
+  material-service:
+    build:
+      context: ./material-service
+      dockerfile: ../Dockerfile
+    container_name: material-service
+    environment:
+      SERVER_URL: http://localhost
+      SERVER_PORT: 3002
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: sutisna
+      DB_USER: root
+      DB_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "3002:3002"
+
+  transaction-service:
+    build:
+      context: ./transaction-service
+      dockerfile: ../Dockerfile
+    container_name: transaction-service
+    environment:
+      SERVER_URL: http://localhost
+      SERVER_PORT: 3003
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: sutisna
+      DB_USER: root
+      DB_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "3003:3003"
+
+volumes:
+  mysql-data:
